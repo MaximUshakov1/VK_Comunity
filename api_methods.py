@@ -1,4 +1,5 @@
 import json
+import urllib.parse as url_p
 
 
 class Post:
@@ -178,6 +179,12 @@ def wall_addComment(owner_id, is_group, post_id, text):
 
     url_list = []
 
+    #print(urlencode(text))
+
+    temp_row = url_p.urlencode({'1':text}, quote_via=url_p.quote)
+    text = temp_row.split('=')[1]
+    #options = url_p.urlencode({'"owner_id"': owner_id, '"post_id"': post_id, '"text"': text}, quote_via=url_p.quote)
+    #print(options)
     options = ('"owner_id":'+str(owner_id) +
                ',"post_id":'+str(post_id) +
                ',"text":'+'"%s"' % text)

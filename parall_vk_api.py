@@ -56,6 +56,7 @@ class PVkApi:
         if execute_key > 0:
             url_request = url_request.strip(',')
             url_request += '};&access_token=%s' % token
+            print(url_request)
             url_object = urlopen(url_request)
             text_response = str(url_object.read().decode())
             response = json.loads(text_response).get('response')
