@@ -43,25 +43,53 @@ class PVkApi:
                 current_time = time.clock()
                 if (current_time - previous_time) < self.QuerysSleepTime:
                     time.sleep(current_time - previous_time)
-                url_object = urlopen(url_request)
-                previous_time = time.clock()
-                text_response = str(url_object.read().decode())
-                response = json.loads(text_response).get('response')
-                for method_id in range(execute_key):
-                    response_list.append(response.get('execute_'+str(method_id)))
 
+                print(len(url_request), url_request)
+                except_count = 0
+                while except_count <= self.ExceptCountMax:
+                    url_object = urlopen(url_request)
+                    previous_time = time.clock()
+                    text_response = str(url_object.read().decode())
+                    response = json.loads(text_response).get('response')
+                    if not response:
+                        except_count += 1
+                        time.sleep(self.ExceptSleepTime)
+                    else:
+                        break
+
+                if response:
+                    for method_id in range(execute_key):
+                        response_list.append(response.get('execute_'+str(method_id)))
+                else:
+                    print('Error:' + url_request)
+                    for method_id in range(execute_key):
+                        response_list.append([])
                 url_request = self.MethodsUrl+'execute?code=return{'
                 execute_key = 0
 
         if execute_key > 0:
             url_request = url_request.strip(',')
             url_request += '};&access_token=%s' % token
-            print(url_request)
-            url_object = urlopen(url_request)
-            text_response = str(url_object.read().decode())
-            response = json.loads(text_response).get('response')
-            for method_id in range(execute_key):
-                response_list.append(response.get('execute_'+str(method_id)))
+
+            print(len(url_request), url_request)
+            except_count = 0
+            while except_count <= self.ExceptCountMax:
+                url_object = urlopen(url_request)
+                text_response = str(url_object.read().decode())
+                response = json.loads(text_response).get('response')
+                if not response:
+                    except_count += 1
+                    time.sleep(self.ExceptSleepTime)
+                else:
+                    break
+
+            if response:
+                for method_id in range(execute_key):
+                    response_list.append(response.get('execute_'+str(method_id)))
+            else:
+                print('Error:' + url_request)
+                for method_id in range(execute_key):
+                    response_list.append([])
 
         return response_list
 

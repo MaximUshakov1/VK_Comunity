@@ -12,6 +12,63 @@ class Post:
         self.num_reposts = num_reposts
 
 
+def users_get(user_ids, fields):
+    class_name = 'users'
+    method_name = 'get'
+    max_count_users = 1000
+
+    url_list = []
+
+    count_users_temp = len(user_ids)
+    offset_temp = 0
+    while count_users_temp > max_count_users:
+        options = ('"user_ids":'+'"%s"' % ','.join([str(user_id) for user_id in user_ids[offset_temp:(offset_temp+max_count_users)]]) +
+                   ',"fields":'+'"%s"' % ','.join(fields))
+
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+        offset_temp += max_count_users
+        count_users_temp -= max_count_users
+    if count_users_temp > 0:
+        options = ('"user_ids":'+'"%s"' % ','.join([str(user_id) for user_id in user_ids[offset_temp:(offset_temp+count_users_temp)]]) +
+                   ',"fields":'+'"%s"' % ','.join(fields))
+
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+    return url_list
+
+
+def parse_users_get(response_list, fields):
+
+    user_list = []
+
+    temp_obj = {}
+    for response_l in response_list:
+        for response in response_l:
+            try:
+                temp_obj['id'] = response.get('uid')
+            except:
+                temp_obj['id'] = -1
+            try:
+                temp_obj['first_name'] = response.get('first_name')
+            except:
+                temp_obj['first_name'] = -1
+            try:
+                temp_obj['last_name'] = response.get('last_name')
+            except:
+                temp_obj['last_name'] = -1
+            for field in fields:
+                try:
+                    temp_obj[field] = response.get(field)
+                except:
+                    temp_obj[field] = -1
+            user_list.append(temp_obj.copy())
+
+    return user_list
+
+
 def groups_getById(group_ids, fields):
     class_name = 'groups'
     method_name = 'getById'
@@ -34,6 +91,26 @@ def groups_getById(group_ids, fields):
         url_list.append(url)
 
     return url_list
+
+
+def parse_groups_getById(response_list, fields):
+
+    group_list = []
+
+    temp_obj = {}
+    for response_l in response_list:
+        for response in response_l:
+            temp_obj['id'] = response.get('gid')
+            temp_obj['name'] = response.get('name')
+            temp_obj['screen_name'] = response.get('screen_name')
+            for field in fields:
+                try:
+                    temp_obj[field] = response.get(field)
+                except:
+                    temp_obj[field] = -1
+            group_list.append(temp_obj.copy())
+
+    return group_list
 
 
 def groups_getMembers(group_id, count, offset=0):
@@ -62,6 +139,14 @@ def groups_getMembers(group_id, count, offset=0):
         url_list.append(url)
 
     return url_list
+
+
+def parse_groups_getMembers(response_list):
+    list_of_list_users = []
+    for response in response_list:
+        list_of_list_users.append(response.get('items'))
+
+    return list_of_list_users
 
 
 def groups_join(group_id):
@@ -192,5 +277,31 @@ def wall_addComment(owner_id, is_group, post_id, text):
     url_list.append(url)
 
     return url_list
+
+
+def friends_get(user_id, offset=0):
+    class_name = 'friends'
+    method_name = 'get'
+
+    url_list = []
+
+    options = ('"user_id":'+str(user_id) +
+               ',"offset":'+ str(offset))
+    url = '%s.%s({%s})' % (class_name, method_name, options)
+    url_list.append(url)
+
+    return url_list
+
+
+def parse_friends_get(response_list):
+    list_friends = []
+
+    for response in response_list:
+        try:
+            list_friends.append({'count': len(response), 'friends': response})
+        except:
+            list_friends.append({'count': 0, 'friends': []})
+
+    return list_friends
 
 
