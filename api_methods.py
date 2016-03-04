@@ -149,6 +149,43 @@ def parse_groups_getMembers(response_list):
     return list_of_list_users
 
 
+def groups_get(user_id, count=1000, offset=0):
+    class_name = 'groups'
+    method_name = 'get'
+    max_count_groups = 1000
+
+    url_list = []
+
+    count_groups_temp = count
+    offset_temp = offset
+    while count_groups_temp > max_count_groups:
+        options = ('"user_id":'+str(user_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(max_count_groups))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+        offset_temp += max_count_groups
+        count_groups_temp -= max_count_groups
+    if count_groups_temp > 0:
+        options = ('"user_id":'+str(user_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(count_groups_temp))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+    return url_list
+
+
+def parse_groups_get(response_list):
+    groups_list = []
+
+    for response in response_list:
+        groups_list.append(response)
+
+    return groups_list
+
+
 def groups_join(group_id):
     class_name = 'groups'
     method_name = 'join'
@@ -279,6 +316,52 @@ def wall_addComment(owner_id, is_group, post_id, text):
     return url_list
 
 
+def wall_getReposts(owner_id, is_group, post_id, count=1000):
+    class_name = 'wall'
+    method_name = 'getReposts'
+    max_count_reposts = 1000
+
+    if is_group:
+        owner_id = - owner_id
+
+    url_list = []
+
+    count_reposts_temp = count
+    offset_temp = 0
+    while count_reposts_temp > max_count_reposts:
+        options = ('"owner_id":'+str(owner_id) +
+                   ',"post_id":'+str(post_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(max_count_reposts))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+        offset_temp += max_count_reposts
+        count_reposts_temp -= max_count_reposts
+    if count_reposts_temp > 0:
+        options = ('"owner_id":'+str(owner_id) +
+                   ',"post_id":'+str(post_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(count_reposts_temp))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+    return url_list
+
+
+def parse_wall_getReposts(response_list):
+    reposters_list = []
+
+    for response in response_list:
+        repost_list = response.get('profiles')
+        reposter_list = []
+        for repost in repost_list:
+            reposter_list.append(repost.get('uid'))
+        reposters_list.append(reposter_list)
+
+    return reposters_list
+
+
 def friends_get(user_id, offset=0):
     class_name = 'friends'
     method_name = 'get'
@@ -305,3 +388,40 @@ def parse_friends_get(response_list):
     return list_friends
 
 
+def likes_getList(type, owner_id, item_id, count=1000):
+    class_name = 'likes'
+    method_name = 'getList'
+    max_count_likes = 1000
+
+    url_list = []
+
+    count_likes_temp = count
+    offset_temp = 0
+    while count_likes_temp > max_count_likes:
+        options = ('"type":'+'"%s"' % type +
+                   ',"owner_id":'+str(-owner_id) +
+                   ',"item_id":'+str(item_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(max_count_likes))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+        offset_temp += max_count_likes
+        count_likes_temp -= max_count_likes
+    if count_likes_temp > 0:
+        options = ('"type":'+'"%s"' % type +
+                   ',"owner_id":'+str(-owner_id) +
+                   ',"item_id":'+str(item_id) +
+                   ',"offset":'+str(offset_temp) +
+                   ',"count":'+str(count_likes_temp))
+        url = '%s.%s({%s})' % (class_name, method_name, options)
+        url_list.append(url)
+
+    return url_list
+
+
+def parse_likes_getList(response_list):
+    user_list = []
+    for response in response_list:
+        user_list.append(response.get('users'))
+    return user_list

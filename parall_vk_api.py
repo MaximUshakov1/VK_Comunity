@@ -44,7 +44,7 @@ class PVkApi:
                 if (current_time - previous_time) < self.QuerysSleepTime:
                     time.sleep(current_time - previous_time)
 
-                print(len(url_request), url_request)
+                #print(len(url_request), url_request)
                 except_count = 0
                 while except_count <= self.ExceptCountMax:
                     url_object = urlopen(url_request)
