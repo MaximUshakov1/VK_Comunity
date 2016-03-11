@@ -103,7 +103,10 @@ def parse_groups_getById(response_list, fields):
             temp_obj['id'] = response.get('gid')
             temp_obj['name'] = response.get('name')
             temp_obj['screen_name'] = response.get('screen_name')
+<<<<<<< HEAD
             temp_obj['type'] = response.get('type')
+=======
+>>>>>>> origin/master
             for field in fields:
                 try:
                     temp_obj[field] = response.get(field)
@@ -463,4 +466,8 @@ def parse_likes_getList(response_list):
     user_list = []
     for response in response_list:
         user_list.append(response.get('users'))
+<<<<<<< HEAD
     return user_list
+=======
+    return user_list
+>>>>>>> origin/master
